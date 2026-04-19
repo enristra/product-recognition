@@ -5,7 +5,7 @@ import pandas as pd
 import tensorflow as tf
 from keras.src.layers import RandomFlip, RandomRotation, RandomZoom, RandomContrast, RandomTranslation
 from keras.src.optimizers import Adam
-from tensorflow.keras.layers import Conv2D, Dense, Input
+from tensorflow.keras.layers import Conv2D, Dense, Input, BatchNormalization, Dropout, Activation, GlobalAveragePooling2D
 from tensorflow.keras.layers import MaxPooling2D, Flatten
 from tensorflow.keras.models import Sequential
 
@@ -21,7 +21,7 @@ def load_image(image_path, label):
     image = image / 255
     return image, label
 
-def get_dataset(path, train):
+def get_dataset(path, train, batch_size):
     df = pd.read_csv(dataset_path + path, header=None)
     df = df.drop(df.columns[-1], axis=1)
     df[0] = df[0].apply(lambda l: str(os.path.join(dataset_path, l)))
@@ -30,7 +30,7 @@ def get_dataset(path, train):
     y = tf.convert_to_tensor(labels)
     dataset = tf.data.Dataset.from_tensor_slices((x, y)).map(load_image)
     if train: dataset = dataset.shuffle(len(df))
-    dataset = dataset.batch(32).prefetch(buffer_size=tf.data.AUTOTUNE)
+    dataset = dataset.batch(batch_size).prefetch(buffer_size=tf.data.AUTOTUNE)
     return dataset
 
 def input_layer():
@@ -81,6 +81,7 @@ def model2():
     model = input_layer()
 
     conv_filter(model)
+    model.add(Flatten())
 
     model.add(Dense(units=42, activation="relu"))
     model.add(Dense(units=81, activation="softmax"))
@@ -95,9 +96,46 @@ def model3():
 
     model = input_layer()
 
-    conv_filter_batch(model)
+    conv_filter_batch(model, size=[32, 64, 128])
+    model.add(Flatten())
 
-    model.add(Dense(units=42, activation="relu"))
+    model.add(Dense(units=512, use_bias=False))
+    model.add(BatchNormalization())
+    model.add(Activation('relu'))
+    model.add(Dropout(0.5))
+    model.add(Dense(units=256, use_bias=False))
+    model.add(BatchNormalization())
+    model.add(Activation('relu'))
+    model.add(Dropout(0.5))
+    model.add(Dense(units=81, activation="softmax"))
+    model.compile(
+        optimizer=Adam(learning_rate=0.001),
+        loss='sparse_categorical_crossentropy',
+        metrics=['accuracy']
+    )
+    return model
+
+def model4():
+    model = input_layer()
+
+    conv_filter_batch(model, size=[64, 128, 256, 512])
+    model.add(GlobalAveragePooling2D())
+
+    model.add(Dense(units=512, use_bias=False))
+    model.add(BatchNormalization())
+    model.add(Activation('relu'))
+    model.add(Dropout(0.5))
+
+    model.add(Dense(units=256, use_bias=False))
+    model.add(BatchNormalization())
+    model.add(Activation('relu'))
+    model.add(Dropout(0.3))
+
+    model.add(Dense(units=128, use_bias=False))
+    model.add(BatchNormalization())
+    model.add(Activation('relu'))
+    model.add(Dropout(0.2))
+
     model.add(Dense(units=81, activation="softmax"))
     model.compile(
         optimizer=Adam(learning_rate=0.001),

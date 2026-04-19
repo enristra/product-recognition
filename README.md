@@ -2,7 +2,7 @@
 Dataset by Markus Klasson's [Grocery Store Dataset][marcusklasson_GroceryStoreDataset] GitHub page.
 
 # Net 1
-## Layer
+##### Layer
  - Conv(32)
  - MaxPooling2D
  - Conv size(64)
@@ -10,11 +10,12 @@ Dataset by Markus Klasson's [Grocery Store Dataset][marcusklasson_GroceryStoreDa
  - Flatten
  - Dense(42)
  - Dense(81) (Output layer)
-## Loss
+##### Loss
  - Adam(0.001)
  - sparse_categorical_crossentropy
 
 # Net 2
+##### Layers
  - Conv(32)
  - MaxPooling2D
  - Conv size(64)
@@ -24,19 +25,21 @@ Dataset by Markus Klasson's [Grocery Store Dataset][marcusklasson_GroceryStoreDa
  - Flatten
  - Dense(42)
  - Dense(81) (Output layer)
-## Loss
+##### Loss
  - Adam(0.001)
  - sparse_categorical_crossentropy
 
 # Net 3
+##### Layers
  - Conv(32, BatchNormalization, Activation('relu'), MaxPooling2D)
  - Conv(64, BatchNormalization, Activation('relu'), MaxPooling2D)
  - Conv(128, BatchNormalization, Activation('relu'), MaxPooling2D)
  - Flatten
- - Dense(42)
- - Dense(81) (Output layer)
+ - Dense(512, BatchNormalization, Activation('relu'), Dropout(0.5))
+ - Dense(256, BatchNormalization, Activation('relu'), Dropout(0.5))
+ - Dense(81, softamx) (Output layer)
 ##### Loss
- - Adam(0.01)
+ - Adam(0.001)
  - sparse_categorical_crossentropy
 
 [marcusklasson_GroceryStoreDataset]: https://github.com/marcusklasson/GroceryStoreDataset

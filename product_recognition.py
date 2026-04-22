@@ -6,9 +6,9 @@ from tensorflow.compiler.mlir import tensorflow
 
 def main():
 
-    train_dataset = models.get_dataset("train.txt", True, 16)
-    val_dataset = models.get_dataset("val.txt", False, 16)
-    test_dataset = models.get_dataset("test.txt", False, 16)
+    train_dataset = models.get_dataset("train.txt", True, 8)
+    val_dataset = models.get_dataset("val.txt", False, 8)
+    test_dataset = models.get_dataset("test.txt", False, 8)
 
     # model1 = models.model1()
     # print(model1.summary())
@@ -22,7 +22,7 @@ def main():
     model4 = models.model4()
     print(model4.summary())
 
-    history2 = model4.fit(train_dataset, validation_data=val_dataset, epochs=20)
+    history2 = model4.fit(train_dataset, validation_data=val_dataset, epochs=100)
     test = model4.evaluate(test_dataset)
     plot(history2)
     # plot_validation(history2, 'Validation')

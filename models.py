@@ -22,7 +22,7 @@ def load_image(image_path, label):
     return image, label
 
 def get_dataset(path, train, batch_size):
-    df = pd.read_csv(dataset_path + path, header=None)
+    df = pd.read_csv(os.path.join(dataset_path, path), header=None)
     df = df.drop(df.columns[-1], axis=1)
     df[0] = df[0].apply(lambda l: str(os.path.join(dataset_path, l)))
     image, labels = (df[0].values, df[1].values)
@@ -118,7 +118,7 @@ def model3():
 def model4():
     model = input_layer()
 
-    conv_filter_batch(model, size=[64, 128, 256, 512])
+    conv_filter_batch(model, size=[32, 64, 128, 256, 512])
     model.add(GlobalAveragePooling2D())
 
     model.add(Dense(units=512, use_bias=False))
@@ -129,16 +129,16 @@ def model4():
     model.add(Dense(units=256, use_bias=False))
     model.add(BatchNormalization())
     model.add(Activation('relu'))
-    model.add(Dropout(0.3))
+    model.add(Dropout(0.5))
 
     model.add(Dense(units=128, use_bias=False))
     model.add(BatchNormalization())
     model.add(Activation('relu'))
-    model.add(Dropout(0.2))
+    model.add(Dropout(0.5))
 
     model.add(Dense(units=81, activation="softmax"))
     model.compile(
-        optimizer=Adam(learning_rate=0.001),
+        optimizer=Adam(learning_rate=0.0001),
         loss='sparse_categorical_crossentropy',
         metrics=['accuracy']
     )

@@ -1,5 +1,4 @@
-from keras.src.layers import BatchNormalization, Activation
-from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten
+from keras.layers import Conv2D, MaxPooling2D, Flatten, BatchNormalization, Activation
 
 
 def conv_filter(model):
@@ -39,6 +38,7 @@ def conv_filter_batch(model, size):
             Conv2D(
                 filters=size[k],
                 kernel_size=3,
+                padding="same",
                 strides=1,
             )
         )

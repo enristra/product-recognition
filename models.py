@@ -1,23 +1,19 @@
 import os.path
-
-import matplotlib.pyplot as plt
 import pandas as pd
 import tensorflow as tf
-from keras.src.layers import RandomFlip, RandomRotation, RandomZoom, RandomContrast, RandomTranslation
-from keras.src.optimizers import Adam
-from tensorflow.keras.layers import Conv2D, Dense, Input, BatchNormalization, Dropout, Activation, GlobalAveragePooling2D
-from tensorflow.keras.layers import MaxPooling2D, Flatten
-from tensorflow.keras.models import Sequential
+from keras.optimizers import Adam
+from keras.layers import Conv2D, Dense, Input, BatchNormalization, Dropout, Activation, GlobalAveragePooling2D, MaxPooling2D, Flatten, RandomFlip, RandomRotation, RandomZoom, RandomContrast, RandomTranslation
+from keras import Sequential
 
 from conv import conv_filter, conv_filter_batch
+from main import CHANNELS, DROPOUT_RATE, IMG_HEIGHT, IMG_SIZE, IMG_WIDTH, LEARNING_RATE
 
 dataset_path = "dataset/"
-image_size = (348, 348)
 
 def load_image(image_path, label):
     file = tf.io.read_file(image_path)
     image = tf.image.decode_jpeg(file, channels=3)
-    image = tf.image.resize(image, image_size)
+    image = tf.image.resize(image, IMG_SIZE)
     image = image / 255
     return image, label
 
@@ -33,15 +29,17 @@ def get_dataset(path, train, batch_size):
     dataset = dataset.batch(batch_size).prefetch(buffer_size=tf.data.AUTOTUNE)
     return dataset
 
-def input_layer():
-    model = Sequential()
-    model.add(Input(shape=(348, 348, 3)))
-    model.add(RandomFlip("horizontal"))
+def input_layer(model_name):
+    model = Sequential(name=model_name)
+    model.add(Input(shape=(IMG_HEIGHT, IMG_WIDTH, CHANNELS)))
+
+    # Data augmentation
     model.add(RandomFlip("horizontal"))
     model.add(RandomRotation(0.2))
     model.add(RandomZoom(0.2))
     model.add(RandomContrast(0.2))
     model.add(RandomTranslation(0.1, 0.1))
+
     return model
 
 def model1():
@@ -102,21 +100,21 @@ def model3():
     model.add(Dense(units=512, use_bias=False))
     model.add(BatchNormalization())
     model.add(Activation('relu'))
-    model.add(Dropout(0.5))
+    model.add(Dropout(DROPOUT_RATE))
     model.add(Dense(units=256, use_bias=False))
     model.add(BatchNormalization())
     model.add(Activation('relu'))
-    model.add(Dropout(0.5))
+    model.add(Dropout(DROPOUT_RATE))
     model.add(Dense(units=81, activation="softmax"))
     model.compile(
-        optimizer=Adam(learning_rate=0.001),
+        optimizer=Adam(learning_rate=LEARNING_RATE),
         loss='sparse_categorical_crossentropy',
         metrics=['accuracy']
     )
     return model
 
 def model4():
-    model = input_layer()
+    model = input_layer("model4")
 
     conv_filter_batch(model, size=[32, 64, 128, 256, 512])
     model.add(GlobalAveragePooling2D())
@@ -124,21 +122,21 @@ def model4():
     model.add(Dense(units=512, use_bias=False))
     model.add(BatchNormalization())
     model.add(Activation('relu'))
-    model.add(Dropout(0.5))
+    model.add(Dropout(DROPOUT_RATE))
 
     model.add(Dense(units=256, use_bias=False))
     model.add(BatchNormalization())
     model.add(Activation('relu'))
-    model.add(Dropout(0.5))
+    model.add(Dropout(DROPOUT_RATE))
 
     model.add(Dense(units=128, use_bias=False))
     model.add(BatchNormalization())
     model.add(Activation('relu'))
-    model.add(Dropout(0.5))
+    model.add(Dropout(DROPOUT_RATE))
 
     model.add(Dense(units=81, activation="softmax"))
     model.compile(
-        optimizer=Adam(learning_rate=0.0001),
+        optimizer=Adam(learning_rate=LEARNING_RATE),
         loss='sparse_categorical_crossentropy',
         metrics=['accuracy']
     )

@@ -2,3 +2,6 @@
 /.venv
 /dataset
 ptxas
+__pycache__/
+*.pyc
+*.pyo

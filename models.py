@@ -5,8 +5,9 @@ from keras.optimizers import Adam
 from keras.layers import Conv2D, Dense, Input, BatchNormalization, Dropout, Activation, GlobalAveragePooling2D, MaxPooling2D, Flatten, RandomFlip, RandomRotation, RandomZoom, RandomContrast, RandomTranslation
 from keras import Sequential
 
-from conv import conv_filter, conv_filter_batch
+from conv import conv_filter, conv_filter_batch, conv_filter_batchAndRegularizer
 from main import CHANNELS, DROPOUT_RATE, IMG_HEIGHT, IMG_SIZE, IMG_WIDTH, LEARNING_RATE
+from keras.regularizers import l2
 
 dataset_path = "dataset/"
 
@@ -130,6 +131,38 @@ def model4():
     model.add(Dropout(DROPOUT_RATE))
 
     model.add(Dense(units=128, use_bias=False))
+    model.add(BatchNormalization())
+    model.add(Activation('relu'))
+    model.add(Dropout(DROPOUT_RATE))
+
+    model.add(Dense(units=81, activation="softmax"))
+    model.compile(
+        optimizer=Adam(learning_rate=LEARNING_RATE),
+        loss='sparse_categorical_crossentropy',
+        metrics=['accuracy']
+    )
+    return model
+
+
+
+def model4withRegularizer():
+    model = input_layer("model4withRegularizer")
+
+    wd = 1e-4
+    conv_filter_batchAndRegularizer(model, size=[32, 64, 128, 256, 512], wd=wd)
+    model.add(GlobalAveragePooling2D())
+
+    model.add(Dense(units=512, use_bias=False, kernel_regularizer=l2(wd)))
+    model.add(BatchNormalization())
+    model.add(Activation('relu'))
+    model.add(Dropout(DROPOUT_RATE))
+
+    model.add(Dense(units=256, use_bias=False, kernel_regularizer=l2(wd)))
+    model.add(BatchNormalization())
+    model.add(Activation('relu'))
+    model.add(Dropout(DROPOUT_RATE))
+
+    model.add(Dense(units=128, use_bias=False, kernel_regularizer=l2(wd)))
     model.add(BatchNormalization())
     model.add(Activation('relu'))
     model.add(Dropout(DROPOUT_RATE))

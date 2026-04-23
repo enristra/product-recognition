@@ -12,9 +12,9 @@ IMG_SIZE = (IMG_HEIGHT, IMG_WIDTH)
 CHANNELS = 3
 
 # Training
-BATCH_SIZE = 32 #8
-EPOCHS = 10 #100
-LEARNING_RATE = 1e-3
+BATCH_SIZE = 16 #8
+EPOCHS = 50 #100
+LEARNING_RATE = 0.001
 SEED = 42
 
 # Modello
@@ -42,17 +42,17 @@ def main():
     # plot_loss(history2)
     # print(f"Test Accuracy: {test[1] * 100:.2f}%\nTest Loss: {test[0]}")
 
-    model = models.model4()
+    model = models.model4withRegularizer()
     print(model.summary())
 
     history = model.fit(train_dataset, validation_data=val_dataset, epochs=EPOCHS, callbacks=[
-        EarlyStopping( # Early stopping per evitare overfitting: se la validation accuracy non migliora per 6 epoche, fermo il training
-            monitor="val_accuracy",
-            patience=6,
-            mode="max",
-            restore_best_weights=True,
-            verbose=1,
-        ),ReduceLROnPlateau( # Riduzione del learning rate quando la validation loss non migliora -> fine tuning automatico
+        # EarlyStopping( # Early stopping per evitare overfitting: se la validation accuracy non migliora per 6 epoche, fermo il training
+        #     monitor="val_accuracy",
+        #     patience=8, #6
+        #     mode="max",
+        #     restore_best_weights=True,
+        #     verbose=1,),
+        ReduceLROnPlateau( # Riduzione del learning rate quando la validation loss non migliora -> fine tuning automatico
             monitor="val_loss",
             factor=0.5,
             patience=3,

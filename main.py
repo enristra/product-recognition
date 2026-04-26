@@ -12,13 +12,13 @@ IMG_SIZE = (IMG_HEIGHT, IMG_WIDTH)
 CHANNELS = 3
 
 # Training
-BATCH_SIZE = 16 #8
-EPOCHS = 50 #100
-LEARNING_RATE = 0.001
+BATCH_SIZE = 32 #8
+EPOCHS = 200 #100
+LEARNING_RATE = 0.001 #0.0005
 SEED = 42
 
 # Modello
-DROPOUT_RATE = 0.5
+DROPOUT_RATE = 0.6
 
 def set_seed(seed):
     np.random.seed(seed)
@@ -27,37 +27,28 @@ def set_seed(seed):
 
 def main():
 
-    # set_seed(SEED)
+    set_seed(SEED)
 
     train_dataset = models.get_dataset("train.txt", True, BATCH_SIZE)
     val_dataset = models.get_dataset("val.txt", False, BATCH_SIZE)
     test_dataset = models.get_dataset("test.txt", False, BATCH_SIZE)
 
-    # model1 = models.model1()
-    # print(model1.summary())
-    #
-    # history2 = model1.fit(train_dataset, validation_data=val_dataset, epochs=10)
-    # test = model1.evaluate(test_dataset)
-    # plot_validation(history2, 'Validation')
-    # plot_loss(history2)
-    # print(f"Test Accuracy: {test[1] * 100:.2f}%\nTest Loss: {test[0]}")
-
-    model = models.model4withRegularizer()
+    model = models.bestModel()
     print(model.summary())
 
     history = model.fit(train_dataset, validation_data=val_dataset, epochs=EPOCHS, callbacks=[
-        # EarlyStopping( # Early stopping per evitare overfitting: se la validation accuracy non migliora per 6 epoche, fermo il training
-        #     monitor="val_accuracy",
-        #     patience=8, #6
-        #     mode="max",
-        #     restore_best_weights=True,
-        #     verbose=1,),
+        EarlyStopping( # Early stopping per evitare overfitting: se la validation accuracy non migliora per 6 epoche, fermo il training
+            monitor="val_accuracy",
+            patience=40, 
+            mode="max",
+            restore_best_weights=True,
+            verbose=1,),
         ReduceLROnPlateau( # Riduzione del learning rate quando la validation loss non migliora -> fine tuning automatico
             monitor="val_loss",
             factor=0.5,
-            patience=3,
+            patience=8, 
             verbose=1,
-            min_lr=1e-6,
+            min_lr=1e-5,
         ),
     ])
 
@@ -65,8 +56,7 @@ def main():
     test_loss, test_acc = test[0], test[1]
 
     plot(history, model.name)
-    # plot_validation(history2, 'Validation')
-    # plot_loss(history2)
+
     print(f"Test Accuracy: {test_acc * 100:.2f}%\nTest Loss: {test_loss}")
 
     # Salvataggio del log

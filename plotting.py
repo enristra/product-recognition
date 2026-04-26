@@ -1,3 +1,6 @@
+from datetime import datetime
+from pathlib import Path
+
 import matplotlib.pyplot as plt
 
 def plot_validation(history, label):
@@ -36,8 +39,12 @@ def plot(history, model_name):
     plt.grid(True)
 
     plt.tight_layout()
-    plt.show()
 
     # Salvataggio
-    filename = f"{model_name}_plots.png"
-    plt.savefig("outputs/plots/"+filename)
+    plots_dir = Path("outputs/plots")
+    plots_dir.mkdir(parents=True, exist_ok=True)
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M")
+    filename = f"{model_name}_{timestamp}_plot.png"
+    plt.savefig(plots_dir / filename)
+
+    plt.show()

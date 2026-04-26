@@ -29,7 +29,6 @@ def conv_filter(model):
         )
     )
     model.add(MaxPooling2D())
-    model.add(Flatten())
 
 def conv_filter_batch(model, size):
 

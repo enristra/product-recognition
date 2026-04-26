@@ -2,7 +2,7 @@ import os.path
 import pandas as pd
 import tensorflow as tf
 from keras.optimizers import Adam
-from keras.layers import Conv2D, Dense, Input, BatchNormalization, Dropout, Activation, GlobalAveragePooling2D, MaxPooling2D, Flatten, RandomFlip, RandomRotation, RandomZoom, RandomContrast, RandomTranslation
+from keras.layers import Conv2D, Dense, Input, BatchNormalization, Dropout, Activation, GlobalAveragePooling2D, MaxPooling2D, Flatten, RandomFlip, RandomRotation, RandomZoom, RandomContrast, RandomTranslation, SpatialDropout2D
 from keras import Sequential
 
 from conv import conv_filter, conv_filter_batch, conv_filter_batchAndRegularizer
@@ -149,18 +149,100 @@ def model4withRegularizer():
     model = input_layer("model4withRegularizer")
 
     wd = 1e-4
-    conv_filter_batchAndRegularizer(model, size=[32, 64, 128, 256, 512], wd=wd)
+    conv_filter_batchAndRegularizer(model, size=[32, 64, 128, 256], wd=wd) #[32, 64, 128, 256, 512]
     model.add(GlobalAveragePooling2D())
 
-    model.add(Dense(units=512, use_bias=False, kernel_regularizer=l2(wd)))
+    # model.add(Dense(units=512, use_bias=False, kernel_regularizer=l2(wd)))
+    # model.add(BatchNormalization())
+    # model.add(Activation('relu'))
+    # model.add(Dropout(DROPOUT_RATE))
+
+    # model.add(Dense(units=256, use_bias=False, kernel_regularizer=l2(wd)))
+    # model.add(BatchNormalization())
+    # model.add(Activation('relu'))
+    # model.add(Dropout(DROPOUT_RATE))
+
+    model.add(Dense(units=128, use_bias=False, kernel_regularizer=l2(wd)))
     model.add(BatchNormalization())
     model.add(Activation('relu'))
     model.add(Dropout(DROPOUT_RATE))
+
+    model.add(Dense(units=81, activation="softmax"))
+    model.compile(
+        optimizer=Adam(learning_rate=LEARNING_RATE),
+        loss='sparse_categorical_crossentropy',
+        metrics=['accuracy']
+    )
+    return model
+
+def model5withRegularizer(): #model con regolarizzazione più leggera rispetto a model5, riesce ad imparare meglio ma overfitta
+    model = input_layer("model5withRegularizer")
+
+    wd = 1e-4
+    conv_filter_batchAndRegularizer(model, size=[32, 64, 128], wd=wd)
+
+    # Blocco 4
+    model.add(Conv2D(256, (3,3), padding='same', kernel_regularizer=l2(wd))),
+    model.add(BatchNormalization()), 
+    model.add(Activation('relu')),
+    model.add(MaxPooling2D(2,2)),
+    model.add(SpatialDropout2D(0.05)),
+    
+    model.add(GlobalAveragePooling2D())
 
     model.add(Dense(units=256, use_bias=False, kernel_regularizer=l2(wd)))
     model.add(BatchNormalization())
     model.add(Activation('relu'))
     model.add(Dropout(DROPOUT_RATE))
+
+    model.add(Dense(units=81, activation="softmax"))
+    model.compile(
+        optimizer=Adam(learning_rate=LEARNING_RATE),
+        loss='sparse_categorical_crossentropy',
+        metrics=['accuracy']
+    )
+    return model
+
+def model5(): #troppo regolarizzato, non riesce ad imparare
+    model = input_layer("model5")
+
+    conv_filter_batch(model, size=[32, 64])
+
+    # Blocco 3
+    model.add(Conv2D(128, (3,3), padding='same')),
+    model.add(BatchNormalization()), 
+    model.add(Activation('relu')),
+    model.add(MaxPooling2D(2,2)),
+    model.add(SpatialDropout2D(0.1)), 
+
+    # Blocco 4
+    model.add(Conv2D(256, (3,3), padding='same')),
+    model.add(BatchNormalization()), 
+    model.add(Activation('relu')),
+    model.add(MaxPooling2D(2,2)),
+    model.add(SpatialDropout2D(0.15)),
+    
+    model.add(GlobalAveragePooling2D())
+
+    model.add(Dense(units=256, use_bias=False))
+    model.add(BatchNormalization())
+    model.add(Activation('relu'))
+    model.add(Dropout(DROPOUT_RATE))
+
+    model.add(Dense(units=81, activation="softmax"))
+    model.compile(
+        optimizer=Adam(learning_rate=LEARNING_RATE),
+        loss='sparse_categorical_crossentropy',
+        metrics=['accuracy']
+    )
+    return model
+
+def bestModel():
+    model = input_layer("bestModel")
+
+    wd = 1e-4
+    conv_filter_batchAndRegularizer(model, size=[32, 64, 128, 256], wd=wd) 
+    model.add(GlobalAveragePooling2D())
 
     model.add(Dense(units=128, use_bias=False, kernel_regularizer=l2(wd)))
     model.add(BatchNormalization())

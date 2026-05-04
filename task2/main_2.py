@@ -1,62 +1,54 @@
 import keras
 import numpy as np
-from logs import save_experiment_log
-import models
-from plotting import plot_validation, plot_loss, plot
 from keras.callbacks import EarlyStopping, ReduceLROnPlateau
-
-# Parametri input
-IMG_HEIGHT = 192 #348
-IMG_WIDTH = 192 #348
-IMG_SIZE = (IMG_HEIGHT, IMG_WIDTH)
-CHANNELS = 3
-
-# Training
-BATCH_SIZE = 32 #8
-EPOCHS = 200 #100
-LEARNING_RATE = 0.001 #0.0005
-SEED = 42
-
-# Modello
-DROPOUT_RATE = 0.6
+from logs import save_experiment_log
+from plotting import plot
+from task2.config_2 import SEED, BATCH_SIZE, EPOCHS, LEARNING_RATE, DROPOUT_RATE, IMG_HEIGHT, IMG_WIDTH, CHANNELS
+from task2.models_2 import model_resnet18_task2a, get_dataset, model_resnet18_task2b
 
 def set_seed(seed):
     np.random.seed(seed)
     keras.utils.set_random_seed(seed)
 
-
 def main():
 
     set_seed(SEED)
 
-    train_dataset = models.get_dataset("train.txt", True, BATCH_SIZE)
-    val_dataset = models.get_dataset("val.txt", False, BATCH_SIZE)
-    test_dataset = models.get_dataset("test.txt", False, BATCH_SIZE)
+    train_dataset = get_dataset("train.txt", train=True,  batch_size=BATCH_SIZE)
+    val_dataset   = get_dataset("val.txt",   train=False, batch_size=BATCH_SIZE)
+    test_dataset  = get_dataset("test.txt",  train=False, batch_size=BATCH_SIZE)
 
-    model = models.bestModel()
+    model = model_resnet18_task2b((IMG_HEIGHT, IMG_WIDTH, CHANNELS), DROPOUT_RATE, LEARNING_RATE)
     print(model.summary())
 
-    history = model.fit(train_dataset, validation_data=val_dataset, epochs=EPOCHS, callbacks=[
-        EarlyStopping( # Early stopping per evitare overfitting: se la validation accuracy non migliora per 6 epoche, fermo il training
+    callbacks = [
+        EarlyStopping(
             monitor="val_accuracy",
-            patience=40, 
+            patience=40,
             mode="max",
             restore_best_weights=True,
-            verbose=1,),
-        ReduceLROnPlateau( # Riduzione del learning rate quando la validation loss non migliora -> fine tuning automatico
+            verbose=1,
+        ),
+        ReduceLROnPlateau(
             monitor="val_loss",
             factor=0.5,
-            patience=8, 
+            patience=8,
             verbose=1,
             min_lr=1e-5,
         ),
-    ])
+    ]
 
-    test = model.evaluate(test_dataset)
-    test_loss, test_acc = test[0], test[1]
+    history = model.fit(
+        train_dataset,
+        validation_data=val_dataset,
+        epochs=EPOCHS,
+        callbacks=callbacks,
+    )
 
+    # Valutazione sul test set
+    test_loss, test_acc = model.evaluate(test_dataset, verbose=0)
+    
     plot(history, model.name)
-
     print(f"Test Accuracy: {test_acc * 100:.2f}%\nTest Loss: {test_loss}")
 
     # Salvataggio del log
@@ -79,6 +71,7 @@ def main():
         config_dict=config_log,
         logs_dir="outputs/logs",
     )
+
 
 if __name__ == "__main__":
     main()

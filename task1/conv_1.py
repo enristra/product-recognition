@@ -1,4 +1,4 @@
-from keras.layers import Conv2D, MaxPooling2D, Flatten, BatchNormalization, Activation
+from keras.layers import Conv2D, MaxPooling2D, BatchNormalization, Activation
 from keras.regularizers import l2
 
 def conv_filter(model):
@@ -7,6 +7,7 @@ def conv_filter(model):
             filters=32,
             kernel_size=3,
             strides=1,
+            padding="same",
             activation="relu"
         )
     )
@@ -16,6 +17,7 @@ def conv_filter(model):
             filters=64,
             kernel_size=3,
             strides=1,
+            padding="same",
             activation="relu"
         )
     )
@@ -25,6 +27,7 @@ def conv_filter(model):
             filters=128,
             kernel_size=3,
             strides=1,
+            padding="same",
             activation="relu"
         )
     )

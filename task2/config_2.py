@@ -7,8 +7,8 @@ CHANNELS   = 3
 # Training
 BATCH_SIZE    = 32
 EPOCHS        = 200
-LEARNING_RATE = 0.001 
+LEARNING_RATE = 1e-4
 SEED          = 42
 
 # Modello
-DROPOUT_RATE  = 0.6  
+DROPOUT_RATE  = 0.5

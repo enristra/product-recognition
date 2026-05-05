@@ -87,8 +87,8 @@ def model_resnet18_task2b(input_shape, dropout_rate, learning_rate):
     # Sblocca tutto il backbone
     backbone.trainable = True
     # poi ricongela i primi layer (feature generiche ImageNet)
-    for layer in backbone.layers[:-30]:
-        layer.trainable = False
+    # for layer in backbone.layers[:-30]:
+    #     layer.trainable = False
 
     inputs = Input(shape=input_shape)
 

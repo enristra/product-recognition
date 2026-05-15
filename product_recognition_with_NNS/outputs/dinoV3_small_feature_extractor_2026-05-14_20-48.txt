@@ -1,0 +1,43 @@
+Log salvato in: outputs/dinov3_small_feature_extractor_2026-05-14_20-48.txt
+Model: "dinov3_small_feature_extractor"
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┓
+┃ Layer (type)                    ┃ Output Shape           ┃       Param # ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━┩
+│ input_layer (InputLayer)        │ (None, 224, 224, 3)    │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dinov3_backbone                 │ (None, 201, 384)       │    21,596,544 │
+│ (DINOV3Backbone)                │                        │               │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ get_item (GetItem)              │ (None, 384)            │             0 │
+└─────────────────────────────────┴────────────────────────┴───────────────┘
+ Total params: 21,596,544 (82.38 MB)
+ Trainable params: 0 (0.00 B)
+ Non-trainable params: 21,596,544 (82.38 MB)
+
+=== ENROLLMENT PHASE ===
+Found 407 files belonging to 14 classes.
+  Classi trovate (14): ['Asparagus', 'Aubergine', 'Beet', 'Cabbage', 'Carrots', 'Cucumber', 'Ginger', 'Leek', 'Mushroom', 'Onion', 'Pepper', 'Potato', 'Tomato', 'Zucchini']
+  Gallery: 407 prototipi, dim embedding = 384
+
+=== INFERENCE PHASE ===
+Found 85 files belonging to 14 classes.
+  Query set: 85 immagini
+
+=== RISULTATI ===
+  Accuracy: 85.88%  (73/85)
+
+  Accuracy per classe:
+    [ 0] Asparagus                  60.00%
+    [ 1] Aubergine                 100.00%
+    [ 2] Beet                      100.00%
+    [ 3] Cabbage                   100.00%
+    [ 4] Carrots                   100.00%
+    [ 5] Cucumber                  100.00%
+    [ 6] Ginger                     75.00%
+    [ 7] Leek                      100.00%
+    [ 8] Mushroom                  100.00%
+    [ 9] Onion                     100.00%
+    [10] Pepper                    100.00%
+    [11] Potato                     60.00%
+    [12] Tomato                     50.00%
+    [13] Zucchini                   80.00%

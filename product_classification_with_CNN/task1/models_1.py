@@ -82,7 +82,8 @@ def model1():
     model.compile(
         optimizer='adam',
         loss='sparse_categorical_crossentropy',
-        metrics=['accuracy']
+        metrics=['accuracy'],
+        jit_compile="auto"
     )
     return model
 
@@ -127,7 +128,7 @@ def model2():
         optimizer=Adam(learning_rate=LEARNING_RATE),
         loss='sparse_categorical_crossentropy',
         metrics=['accuracy'],
-        jit_compile=False #?
+        jit_compile="auto"
     )
     return model
 
@@ -168,7 +169,8 @@ def model3():
     model.compile(
         optimizer=Adam(learning_rate=LEARNING_RATE),
         loss='sparse_categorical_crossentropy',
-        metrics=['accuracy']
+        metrics=['accuracy'],
+        jit_compile="auto"
     )
     return model
 
@@ -210,7 +212,8 @@ def model4():
     model.compile(
         optimizer=Adam(learning_rate=LEARNING_RATE),
         loss='sparse_categorical_crossentropy',
-        metrics=['accuracy']
+        metrics=['accuracy'],
+        jit_compile="auto"
     )
     return model
 
@@ -269,7 +272,7 @@ def model5():
     model = Model(name = "model5", inputs=inputs, outputs=[super_class, fine_class])
     model.compile(
         optimizer=Adam(LEARNING_RATE),
-        jit_compile=False, #?
+        jit_compile="auto",
         loss={
             's': 'sparse_categorical_crossentropy',
             'f': 'sparse_categorical_crossentropy'

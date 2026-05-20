@@ -1,6 +1,5 @@
 /.idea
 /.venv
-/nn_search_dataset
 ptxas
 __pycache__/
 *.pyc

@@ -68,6 +68,8 @@ def resnet50_feature_extractor():
     x = GlobalAveragePooling2D()(x) # → vettore 2048-D
     return Model(inputs, x, name="resnet50_feature_extractor")
 
+# Per DINOv2small e DINOv3small l’output della backbone è una sequenza di token, quindi si deve convertirla in un embedding 2D (N, D) prima della cosine similarity.
+# Per ottenere un embedding globale dell’immagine è stato usato il CLS token 
 def dinoV2small_feature_extractor():
     backbone = models.DINOV2Backbone.from_preset(
         "dinov2_small",
@@ -87,6 +89,3 @@ def dinoV3small_feature_extractor():
     outputs = backbone({"pixel_values": inputs}) # feature map (16×16×384)
     x = outputs[:, 0, :] # CLS token -> shape: (batch, 384)
     return Model(inputs, x, name="dinoV3_small_feature_extractor")
-
-# Per DINOv2small e DINOv3small l’output della backbone è una sequenza di token, quindi si deve convertirla in un embedding 2D (N, D) prima della cosine similarity.
-# Per ottenere un embedding globale dell’immagine è stato usato il CLS token 

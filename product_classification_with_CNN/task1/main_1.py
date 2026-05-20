@@ -30,9 +30,9 @@ def main():
 
     set_seed(SEED)
 
-    train_dataset = models.get_dataset("train.txt", True, BATCH_SIZE, True)
-    val_dataset = models.get_dataset("val.txt", False, BATCH_SIZE, True)
-    test_dataset = models.get_dataset("test.txt", False, BATCH_SIZE, True)
+    train_dataset = models.get_dataset("train.txt", True, BATCH_SIZE, False) # true solo per model5
+    val_dataset = models.get_dataset("val.txt", False, BATCH_SIZE, False)
+    test_dataset = models.get_dataset("test.txt", False, BATCH_SIZE, False)
 
     # Scelta del modello da addestrare da terminale
     args = parse_args()

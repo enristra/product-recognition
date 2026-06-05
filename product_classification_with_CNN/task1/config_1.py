@@ -1,5 +1,5 @@
 # Parametri input
-IMG_HEIGHT = 192 #348
+IMG_HEIGHT = 192 #348 dimensioni originali
 IMG_WIDTH = 192 #348
 IMG_SIZE = (IMG_HEIGHT, IMG_WIDTH)
 CHANNELS = 3

@@ -1,11 +1,18 @@
+import gc
 import numpy as np
 from sklearn.decomposition import PCA
 import tensorflow as tf
+from tensorflow.keras.backend import clear_session
 from models import dinoV2small_feature_extractor, dinoV3small_feature_extractor, resnet18_feature_extractor, get_proto_dataset, get_query_dataset, resnet50_feature_extractor
 from logs import logger
 from scipy.spatial.distance import cdist
+from config import SEED
 
 # UTILITY
+def empty_cache():
+    clear_session()
+    gc.collect()
+
 def extract_embeddings(model, dataset):
     """
     Estrae gli embeddings passando tutto il dataset attraverso il modello.
@@ -47,44 +54,35 @@ def compute_inv_cov_pca(embs, labels, n_components=50):
 
     # Verifica che n_components sia sostenibile
     if n_components >= dof:
-        print(f"Attenzione: n_components={n_components} >= gradi_libertà={dof}. "
-              f"Ridotto a {dof // 4}.")
-        n_components = dof // 4
+        print(f"Attenzione: n_components={n_components} >= DoF={dof}. Ridotto a {dof // 4}.")
+        n_components = max(1, dof // 4)
 
     # 1. PCA fit sui prototipi
-    pca = PCA(n_components=n_components, random_state=42) # random_state=42 garantisce riproducibilità indipendentemente dal solver -> deterministico
+    pca = PCA(n_components=n_components, random_state=SEED)
     embs_pca = pca.fit_transform(embs)  # (N, 384) → (N, n_components)
-    # varianza = np.cumsum(pca.explained_variance_ratio_)[-1] * 100
-    # print(f"  [PCA={n_components}] Varianza spiegata: {varianza:.2f}%")
 
     # 2. Centratura per classe nello spazio ridotto
     centered = np.vstack([
         embs_pca[labels == c] - embs_pca[labels == c].mean(axis=0)
         for c in unique_labels
     ])
-    
+
     # 3. Covarianza (n_components × n_components) → ben stimabile
     cov = np.cov(centered, rowvar=False)
-    
-    # Diagnosi per controllare la stabilità numerica della matrice di covarianza
-    # eigenvalues = np.linalg.eigvalsh(cov)
-    # print(f"  [PCA={n_components}] Autovalore min: {eigenvalues.min():.6f}")
-    # print(f"  [PCA={n_components}] Autovalore max: {eigenvalues.max():.6f}")
-    # print(f"  [PCA={n_components}] Condition number: {eigenvalues.max()/max(eigenvalues.min(), 1e-10):.2f}")
-    
+
     inv_cov = np.linalg.inv(cov + np.eye(n_components) * 1e-5)
     return pca, inv_cov
 
 def mahalanobis_distance(query_embs, proto_embs, proto_labels, pca, inv_cov):
     query_embs = pca.transform(query_embs)
     proto_embs = pca.transform(proto_embs)
-    
+
     distances = cdist(query_embs, proto_embs, metric='mahalanobis', VI=inv_cov)
     return proto_labels[np.argmin(distances, axis=1)]
 
-def print_results(true_labels, pred_labels, class_names):
-    """ 
-    Stampa risultati delle accuracy globali e per classe in una tabella ordinata. 
+def print_results_table(true_labels, pred_labels, class_names):
+    """
+    Stampa risultati delle accuracy globali e per classe in una tabella ordinata.
     """
     print("\n=== RISULTATI ===")
     methods = list(pred_labels.keys())
@@ -129,10 +127,10 @@ def enrollment_phase(model, n_components=50):
     # PCA + inv_cov calcolati sui prototipi RAW (più campioni → stima migliore)
     pca, inv_cov = compute_inv_cov_pca(embs, labels, n_components)
 
-    # Gallery A: tutti i prototipi
+    # Gallery ALL: tutti i prototipi
     gallery_all  = (embs, labels)
 
-    # Gallery B: media per classe
+    # Gallery MEAN: media per classe
     mean_embs    = np.stack([embs[labels == c].mean(axis=0) for c in unique_labels])
     gallery_mean = (mean_embs, unique_labels)
 
@@ -154,41 +152,78 @@ def inference_phase(model, gallery_all, gallery_mean, pca, inv_cov):
     print(f"  Query set: {query_embs.shape[0]} immagini")
 
     pred_labels = {
-        "all  | cosine": nearest_neighbour_predict(cosine_similarity_matrix(query_embs, gallery_all[0]), gallery_all[1]),
-        "all  | mahalanobis": mahalanobis_distance(query_embs, gallery_all[0], gallery_all[1], pca, inv_cov),
-        "mean | cosine": nearest_neighbour_predict(cosine_similarity_matrix(query_embs, gallery_mean[0]), gallery_mean[1]),
-        "mean | mahalanobis": mahalanobis_distance(query_embs, gallery_mean[0], gallery_mean[1], pca, inv_cov),
+        "all  | cosine"      : nearest_neighbour_predict(cosine_similarity_matrix(query_embs, gallery_all[0]), gallery_all[1]),
+        "all  | mahalanobis" : mahalanobis_distance(query_embs, gallery_all[0], gallery_all[1], pca, inv_cov),
+        "mean | cosine"      : nearest_neighbour_predict(cosine_similarity_matrix(query_embs, gallery_mean[0]), gallery_mean[1]),
+        "mean | mahalanobis" : mahalanobis_distance(query_embs, gallery_mean[0], gallery_mean[1], pca, inv_cov),
     }
-    
+
     return true_labels, pred_labels
 
 def main():
 
-    backbones = {
-        resnet18_feature_extractor,
-        resnet50_feature_extractor,
-        dinoV2small_feature_extractor,
-        dinoV3small_feature_extractor,
+    BACKBONES = {
+        "ResNet-18"   : resnet18_feature_extractor,
+        "ResNet-50"   : resnet50_feature_extractor,
+        "DINOv2-Small": dinoV2small_feature_extractor,
+        "DINOv3-Small": dinoV3small_feature_extractor,
     }
 
-    for backbone in backbones:
+    # Dizionario per raccogliere i risultati di tutti i backbone (per il confronto finale)
+    all_results = {}
+
+    for backbone_name, backbone_fn in BACKBONES.items():
+        print(f"\n{'#'*70}")
+        print(f"  BACKBONE: {backbone_name}")
+        print(f"{'#'*70}")
 
         # 1. Extractor: costruisce il modello di feature extraction.
-        model = backbone()
+        model = backbone_fn()
         logger(model, logs_dir="outputs")
-        model.summary()
+        model.summary(line_length=70)
 
         # Componenti PCA da testare
         pca_components = 50
 
         # 2. Enrollment: costruisce la gallery degli embeddings dai prototipi.
-        gallery_embs, gallery_mean, class_names, pca, inv_cov = enrollment_phase(model, n_components=pca_components)
+        gallery_all, gallery_mean, class_names, pca, inv_cov = enrollment_phase(model, n_components=pca_components)
 
         # 3. Inference: per ogni query estraiamo l'embedding e lo confrontiamo con la gallery usando diverse metriche.
-        true_labels, pred_labels = inference_phase(model, gallery_embs, gallery_mean, pca, inv_cov)
+        true_labels, pred_labels = inference_phase(model, gallery_all, gallery_mean, pca, inv_cov)
 
         # 4. Stampa i risultati
-        print_results(true_labels, pred_labels, class_names)
+        print_results_table(true_labels, pred_labels, class_names)
+
+        # 5. Salva i risultati per il confronto finale
+        all_results[backbone_name] = {
+            "true"       : true_labels,
+            "pred"       : pred_labels,
+            "class_names": class_names,
+        }
+
+        # Libera la memoria del modello corrente prima di caricare il successivo
+        empty_cache()
+        print(f"Esecuzione {backbone_name} completata.")
+
+    # Confronto finale: accuracy globale per backbone × metodo
+    backbone_names = list(all_results.keys())
+    methods        = list(all_results[backbone_names[0]]["pred"].keys())
+
+    print("\n=== CONFRONTO BACKBONE — ACCURACY GLOBALE (%) ===")
+    col_w = 22
+    print(f"  {'Backbone':<18}", end="")
+    for m in methods:
+        print(f"{m:^{col_w}}", end="")
+    print(f"{'BEST':^12}")
+    print("  " + "-" * (18 + col_w * len(methods) + 12))
+    for bname in backbone_names:
+        true  = all_results[bname]["true"]
+        preds = all_results[bname]["pred"]
+        accs  = [np.sum(true == preds[m]) / len(true) * 100 for m in methods]
+        print(f"  {bname:<18}", end="")
+        for a in accs:
+            print(f"{a:^{col_w}.2f}", end="")
+        print(f"{max(accs):^12.2f}")
 
 
 if __name__ == "__main__":

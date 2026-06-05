@@ -8,9 +8,8 @@ def save_log(
     config_dict,
     logs_dir,
 ):
-    """
-    Salva un report testuale dell'esperimento
-    """
+#  Salva un report testuale dell'esperimento
+
     logs_dir = Path(logs_dir)
     logs_dir.mkdir(parents=True, exist_ok=True)
 

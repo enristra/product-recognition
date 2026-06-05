@@ -30,29 +30,32 @@ def main():
 
     set_seed(SEED)
 
-    train_dataset = models.get_dataset("train.txt", True, BATCH_SIZE, False) # true solo per model5
-    val_dataset = models.get_dataset("val.txt", False, BATCH_SIZE, False)
-    test_dataset = models.get_dataset("test.txt", False, BATCH_SIZE, False)
-
     # Scelta del modello da addestrare da terminale
     args = parse_args()
     name_model = args.model
+    is_multitask = (name_model == "model5")
+
+    train_dataset = models.get_dataset("train.txt", True, BATCH_SIZE, is_multitask)
+    val_dataset = models.get_dataset("val.txt", False, BATCH_SIZE, is_multitask)
+    test_dataset = models.get_dataset("test.txt", False, BATCH_SIZE, is_multitask)
+
     model = MODEL_REGISTRY[name_model]()
     print(model.summary())
 
+    monitor_acc  = "val_f_accuracy" if is_multitask else "val_accuracy"
+    monitor_loss = "val_f_loss"     if is_multitask else "val_loss"
+
     history = model.fit(train_dataset, validation_data=val_dataset, epochs=EPOCHS, callbacks=[
-        EarlyStopping( # Early stopping per evitare overfitting: se la validation accuracy non migliora per 6 epoche, fermo il training
-            monitor="val_accuracy",
-            # monitor="val_f_accuracy", # monitor della validation accuracy per model5
-            patience=40, 
+        EarlyStopping(
+            monitor=monitor_acc,
+            patience=40,
             mode="max",
             restore_best_weights=True,
             verbose=1,),
-        ReduceLROnPlateau( # Riduzione del learning rate quando la validation loss non migliora -> fine tuning automatico
-            monitor="val_loss",
-            # monitor="val_f_loss", # monitor della validation loss per model5
+        ReduceLROnPlateau(
+            monitor=monitor_loss,
             factor=0.5,
-            patience=8, 
+            patience=8,
             verbose=1,
             min_lr=1e-5,
         ),

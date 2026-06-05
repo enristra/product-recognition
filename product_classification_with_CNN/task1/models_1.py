@@ -36,18 +36,6 @@ def get_dataset(path, train, batch_size, super_label=False):
     dataset = dataset.batch(batch_size).prefetch(buffer_size=tf.data.AUTOTUNE)
     return dataset
 
-# def get_dataset(path, train, batch_size):
-#     df = pd.read_csv(os.path.join(dataset_path, path), header=None)
-#     df = df.drop(df.columns[-1], axis=1)
-#     df[0] = df[0].apply(lambda l: str(os.path.join(dataset_path, l)))
-#     image, labels = (df[0].values, df[1].values)
-#     x = tf.convert_to_tensor(image, dtype=tf.string)
-#     y = tf.convert_to_tensor(labels)
-#     dataset = tf.data.Dataset.from_tensor_slices((x, y)).map(load_image)
-#     if train: dataset = dataset.shuffle(len(df))
-#     dataset = dataset.batch(batch_size).prefetch(buffer_size=tf.data.AUTOTUNE)
-#     return dataset
-
 # Definizione di input layer 
 def input_layer(data_augmentation = True):
     inputs = Input(shape=(IMG_HEIGHT, IMG_WIDTH, CHANNELS))
@@ -80,14 +68,14 @@ def model1():
     
     model = Model(name="model1", inputs=inputs, outputs=outputs)
     model.compile(
-        optimizer='adam',
+        optimizer=Adam(learning_rate=LEARNING_RATE),
         loss='sparse_categorical_crossentropy',
-        metrics=['accuracy'],
-        jit_compile="auto"
+        metrics=["accuracy"],
+        jit_compile=False
     )
     return model
 
-# Model 2 - CNN con batch normalization e data augmentation -> ridotto overfitting
+# Model 2 - CNN con batch normalization e data augmentation 
 def model2():
     inputs, x = input_layer()
 
@@ -113,10 +101,10 @@ def model2():
 
     x = Flatten()(x)
 
-    x = Dense(units=162, use_bias=False)(x)
+    x = Dense(units=128, use_bias=False)(x)
     x = Activation('relu')(x)
     x = BatchNormalization()(x)
-    x = Dense(units=162, use_bias=False)(x)
+    x = Dense(units=128, use_bias=False)(x)
     x = BatchNormalization()(x)
     x = Activation('relu')(x)
     x = Dropout(DROPOUT_RATE)(x)
@@ -127,12 +115,11 @@ def model2():
     model.compile(
         optimizer=Adam(learning_rate=LEARNING_RATE),
         loss='sparse_categorical_crossentropy',
-        metrics=['accuracy'],
-        jit_compile="auto"
+        metrics=['accuracy']
     )
     return model
 
-# Model 3 - CNN più profonda con global average pooling -> riduzione dei parametri e miglioramento della generalizzazione
+# Model 3 - CNN più profonda con global average pooling
 def model3():
     inputs, x = input_layer()
 
@@ -174,7 +161,7 @@ def model3():
     )
     return model
 
-# Model 4 - Best model: aggiunta di regolarizzazione L2 per ridurre ulteriormente l'overfitting, miglioramento della generalizzazione e aumento dell'accuracy
+# Model 4 - aggiunta di regolarizzazione L2 per ridurre ulteriormente l'overfitting, miglioramento della generalizzazione e aumento dell'accuracy
 def model4():
     wd = 1e-4
     inputs, x = input_layer()
@@ -199,6 +186,11 @@ def model4():
     x = Activation('relu')(x)
     x = MaxPooling2D()(x)
 
+    x = Conv2D(filters=512, kernel_size=3, kernel_regularizer=l2(wd))(x)
+    x = BatchNormalization()(x)
+    x = Activation('relu')(x)
+    x = MaxPooling2D()(x)
+
     x = GlobalAveragePooling2D()(x)
 
     x = Dense(units=128, use_bias=False, kernel_regularizer=l2(wd))(x)
@@ -217,17 +209,12 @@ def model4():
     )
     return model
 
-# Model 5 - CNN con multi-task learning per classificazione gerarchica -> miglioramento dell'accuracy e della generalizzazione grazie alla condivisione delle rappresentazioni tra i due task
+# Model 5 - CNN con multi-task learning per classificazione gerarchica (super class + fine class)
 def model5():
     wd = 1e-3
     inputs, x = input_layer()
 
-    conv = Conv2D(filters=16, kernel_size=3, kernel_regularizer=l2(wd))(x)
-    conv = BatchNormalization()(conv)
-    conv = Activation('relu')(conv)
-    conv = MaxPooling2D()(conv)
-
-    conv = Conv2D(filters=32, kernel_size=3, kernel_regularizer=l2(wd))(conv)
+    conv = Conv2D(filters=32, kernel_size=3, kernel_regularizer=l2(wd))(x)
     conv = BatchNormalization()(conv)
     conv = Activation('relu')(conv)
     conv = MaxPooling2D()(conv)
@@ -247,19 +234,12 @@ def model5():
     conv = Activation('relu')(conv)
     conv = MaxPooling2D()(conv)
 
-    # conv = Conv2D(filters=256, kernel_size=3, kernel_regularizer=l2(wd))(conv)
-    # conv = BatchNormalization()(conv)
-    # conv = Activation('relu')(conv)
-    # conv = MaxPooling2D()(conv)
-
-    # conv = Dropout(DROPOUT_RATE)(conv)
-
+    conv = Conv2D(filters=512, kernel_size=3, kernel_regularizer=l2(wd))(conv)
+    conv = BatchNormalization()(conv)
+    conv = Activation('relu')(conv)
+    conv = MaxPooling2D()(conv)
+    
     conv = GlobalAveragePooling2D()(conv)
-
-    # dense = Dense(units=324, use_bias=False, kernel_regularizer=l2(wd))(conv)
-    # dense = Dropout(DROPOUT_RATE)(dense)
-    # dense = Activation('relu')(dense)
-    # dense = BatchNormalization()(dense)
 
     dense = Dense(units=128, use_bias=False, kernel_regularizer=l2(wd))(conv)
     dense = BatchNormalization()(dense)
@@ -272,7 +252,7 @@ def model5():
     model = Model(name = "model5", inputs=inputs, outputs=[super_class, fine_class])
     model.compile(
         optimizer=Adam(LEARNING_RATE),
-        jit_compile="auto",
+        jit_compile=False,
         loss={
             's': 'sparse_categorical_crossentropy',
             'f': 'sparse_categorical_crossentropy'
@@ -288,7 +268,7 @@ def model5():
     )
     return model
 
-# ----------------------- Altri modelli -----------------------
+# ----------------------- Altri modelli (non inclusi nel notebook) -----------------------
 
 # # MineModel 2 - CNN con batch normalization e data augmentation -> ridotto overfitting
 # def MineModel2():

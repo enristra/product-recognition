@@ -39,10 +39,6 @@ def get_dataset(path, train, batch_size):
 
 
 def model_resnet18_task2a(input_shape, dropout_rate, learning_rate, fine_tune=False):
-    """
-    Costruisce il modello base per il Task 2a:
-    backbone ResNet-18 congelata + testa di classificazione identica al bestModel del Task 1.
-    """
 
     backbone = models.ResNetBackbone.from_preset("resnet_18_imagenet")
     backbone.trainable = fine_tune # False: backbone congelato, True: fine-tuning
@@ -79,9 +75,6 @@ def model_resnet18_task2a(input_shape, dropout_rate, learning_rate, fine_tune=Fa
     return model
 
 def model_resnet18_task2b(input_shape, dropout_rate, learning_rate):
-    """
-    Costruisce il modello per il Task 2b: fine-tuning della ResNet-18 con unfreeze parziale degli ultimi layer del backbone.
-    """
     backbone = models.ResNetBackbone.from_preset("resnet_18_imagenet")
     
     # Sblocca tutto il backbone

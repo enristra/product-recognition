@@ -1,7 +1,7 @@
 import keras
 import numpy as np
 from keras.callbacks import EarlyStopping, ReduceLROnPlateau
-from logs import save_experiment_log
+from logs import save_log
 from plotting import plot
 from task2.config_2 import SEED, BATCH_SIZE, EPOCHS, LEARNING_RATE, DROPOUT_RATE, IMG_HEIGHT, IMG_WIDTH, CHANNELS
 from task2.models_2 import model_resnet18_task2a, get_dataset, model_resnet18_task2b
@@ -63,11 +63,10 @@ def main():
         "seed": SEED,
     }
 
-    save_experiment_log(
+    save_log(
         model=model,
         history=history,
-        test_loss=test_loss,
-        test_acc=test_acc,
+        test_results={'accuracy': test_acc, 'loss': test_loss},
         config_dict=config_log,
         logs_dir="outputs/logs",
     )

@@ -88,4 +88,4 @@ def dinoV3small_feature_extractor():
     inputs = Input(shape=(IMG_HEIGHT, IMG_WIDTH, CHANNELS)) 
     outputs = backbone({"pixel_values": inputs}) # feature map (16×16×384)
     x = outputs[:, 0, :] # CLS token -> shape: (batch, 384)
-    return Model(inputs, x, name="dinoV3_small_feature_extractor")
+    return Model(inputs, x, name="dinoV3small_feature_extractor")

@@ -1,0 +1,218 @@
+
+######################################################################
+  BACKBONE: ResNet-18
+######################################################################
+Downloading to /root/.cache/kagglehub/models/keras/resnetv1/keras/resnet_18_imagenet/3/config.json...
+100%|██████████| 836/836 [00:00<00:00, 1.20MB/s]
+Downloading to /root/.cache/kagglehub/models/keras/resnetv1/keras/resnet_18_imagenet/3/model.weights.h5...
+100%|██████████| 42.8M/42.8M [00:01<00:00, 28.7MB/s]
+Model: "resnet18_feature_extractor"
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┓
+┃ Layer (type)                 ┃ Output Shape          ┃     Param # ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━┩
+│ input_layer_1 (InputLayer)   │ (None, 224, 224, 3)   │           0 │
+├──────────────────────────────┼───────────────────────┼─────────────┤
+│ res_net_backbone             │ (None, 7, 7, 512)     │  11,186,112 │
+│ (ResNetBackbone)             │                       │             │
+├──────────────────────────────┼───────────────────────┼─────────────┤
+│ global_average_pooling2d     │ (None, 512)           │           0 │
+│ (GlobalAveragePooling2D)     │                       │             │
+└──────────────────────────────┴───────────────────────┴─────────────┘
+ Total params: 11,186,112 (42.67 MB)
+ Trainable params: 0 (0.00 B)
+ Non-trainable params: 11,186,112 (42.67 MB)
+
+=== ENROLLMENT PHASE ===
+Found 407 files belonging to 14 classes.
+  Classi trovate (14): ['Asparagus', 'Aubergine', 'Beet', 'Cabbage', 'Carrots', 'Cucumber', 'Ginger', 'Leek', 'Mushroom', 'Onion', 'Pepper', 'Potato', 'Tomato', 'Zucchini']
+  Gallery (all):  407 prototipi, dim embedding = 512
+  Gallery (mean): 14 prototipi (1 per classe), dim = 512
+
+=== INFERENCE PHASE ===
+Found 85 files belonging to 14 classes.
+  Query set: 85 immagini
+
+=== RISULTATI ===
+
+  Classe                         all  | cosine       all  | mahalanobis      mean | cosine       mean | mahalanobis  
+  -------------------------------------------------------------------------------------------------------------------
+  OVERALL                            80.00                 78.82                 80.00                 80.00         
+  -------------------------------------------------------------------------------------------------------------------
+  [ 0] Asparagus                       0.00                 20.00                 60.00                 20.00         
+  [ 1] Aubergine                      100.00                75.00                 100.00                100.00        
+  [ 2] Beet                           100.00                100.00                100.00                100.00        
+  [ 3] Cabbage                        100.00                100.00                80.00                 100.00        
+  [ 4] Carrots                        100.00                100.00                100.00                100.00        
+  [ 5] Cucumber                       80.00                 80.00                 80.00                 80.00         
+  [ 6] Ginger                         50.00                 50.00                 75.00                 25.00         
+  [ 7] Leek                           100.00                100.00                100.00                100.00        
+  [ 8] Mushroom                       60.00                 60.00                 80.00                 80.00         
+  [ 9] Onion                          100.00                100.00                20.00                 60.00         
+  [10] Pepper                         93.33                 86.67                 100.00                100.00        
+  [11] Potato                         40.00                 40.00                 50.00                 50.00         
+  [12] Tomato                         100.00                100.00                87.50                 87.50         
+  [13] Zucchini                       100.00                100.00                80.00                 100.00        
+Esecuzione ResNet-18 completata.
+
+######################################################################
+  BACKBONE: ResNet-50
+######################################################################
+Downloading to /root/.cache/kagglehub/models/keras/resnetv1/keras/resnet_50_imagenet/3/config.json...
+100%|██████████| 841/841 [00:00<00:00, 610kB/s]
+Downloading to /root/.cache/kagglehub/models/keras/resnetv1/keras/resnet_50_imagenet/3/model.weights.h5...
+100%|██████████| 90.3M/90.3M [00:02<00:00, 37.3MB/s]
+Model: "resnet50_feature_extractor"
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┓
+┃ Layer (type)                 ┃ Output Shape          ┃     Param # ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━┩
+│ input_layer_1 (InputLayer)   │ (None, 224, 224, 3)   │           0 │
+├──────────────────────────────┼───────────────────────┼─────────────┤
+│ res_net_backbone             │ (None, 7, 7, 2048)    │  23,561,152 │
+│ (ResNetBackbone)             │                       │             │
+├──────────────────────────────┼───────────────────────┼─────────────┤
+│ global_average_pooling2d     │ (None, 2048)          │           0 │
+│ (GlobalAveragePooling2D)     │                       │             │
+└──────────────────────────────┴───────────────────────┴─────────────┘
+ Total params: 23,561,152 (89.88 MB)
+ Trainable params: 0 (0.00 B)
+ Non-trainable params: 23,561,152 (89.88 MB)
+
+=== ENROLLMENT PHASE ===
+Found 407 files belonging to 14 classes.
+  Classi trovate (14): ['Asparagus', 'Aubergine', 'Beet', 'Cabbage', 'Carrots', 'Cucumber', 'Ginger', 'Leek', 'Mushroom', 'Onion', 'Pepper', 'Potato', 'Tomato', 'Zucchini']
+  Gallery (all):  407 prototipi, dim embedding = 2048
+  Gallery (mean): 14 prototipi (1 per classe), dim = 2048
+
+=== INFERENCE PHASE ===
+Found 85 files belonging to 14 classes.
+  Query set: 85 immagini
+
+=== RISULTATI ===
+
+  Classe                         all  | cosine       all  | mahalanobis      mean | cosine       mean | mahalanobis  
+  -------------------------------------------------------------------------------------------------------------------
+  OVERALL                            80.00                 87.06                 74.12                 85.88         
+  -------------------------------------------------------------------------------------------------------------------
+  [ 0] Asparagus                      20.00                 40.00                 20.00                 60.00         
+  [ 1] Aubergine                      100.00                100.00                100.00                100.00        
+  [ 2] Beet                           100.00                100.00                100.00                100.00        
+  [ 3] Cabbage                        100.00                100.00                100.00                100.00        
+  [ 4] Carrots                        100.00                100.00                100.00                100.00        
+  [ 5] Cucumber                       60.00                 80.00                 40.00                 60.00         
+  [ 6] Ginger                          0.00                 100.00                25.00                 100.00        
+  [ 7] Leek                           100.00                100.00                100.00                100.00        
+  [ 8] Mushroom                       80.00                 100.00                100.00                80.00         
+  [ 9] Onion                          100.00                100.00                60.00                 80.00         
+  [10] Pepper                         100.00                100.00                100.00                100.00        
+  [11] Potato                         50.00                 40.00                 20.00                 50.00         
+  [12] Tomato                         87.50                 87.50                 87.50                 87.50         
+  [13] Zucchini                       100.00                100.00                80.00                 100.00        
+Esecuzione ResNet-50 completata.
+
+######################################################################
+  BACKBONE: DINOv2-Small
+######################################################################
+Downloading to /root/.cache/kagglehub/models/keras/dinov2/keras/dinov2_small/1/config.json...
+100%|██████████| 780/780 [00:00<00:00, 1.23MB/s]
+Downloading to /root/.cache/kagglehub/models/keras/dinov2/keras/dinov2_small/1/model.weights.h5...
+100%|██████████| 86.7M/86.7M [00:02<00:00, 37.7MB/s]
+Model: "dinoV2small_feature_extractor"
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┓
+┃ Layer (type)                 ┃ Output Shape          ┃     Param # ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━┩
+│ input_layer (InputLayer)     │ (None, 224, 224, 3)   │           0 │
+├──────────────────────────────┼───────────────────────┼─────────────┤
+│ dinov2_backbone              │ (None, 257, 384)      │  22,155,264 │
+│ (DINOV2Backbone)             │                       │             │
+├──────────────────────────────┼───────────────────────┼─────────────┤
+│ get_item (GetItem)           │ (None, 384)           │           0 │
+└──────────────────────────────┴───────────────────────┴─────────────┘
+ Total params: 22,155,264 (84.52 MB)
+ Trainable params: 0 (0.00 B)
+ Non-trainable params: 22,155,264 (84.52 MB)
+
+=== ENROLLMENT PHASE ===
+Found 407 files belonging to 14 classes.
+  Classi trovate (14): ['Asparagus', 'Aubergine', 'Beet', 'Cabbage', 'Carrots', 'Cucumber', 'Ginger', 'Leek', 'Mushroom', 'Onion', 'Pepper', 'Potato', 'Tomato', 'Zucchini']
+  Gallery (all):  407 prototipi, dim embedding = 384
+  Gallery (mean): 14 prototipi (1 per classe), dim = 384
+
+=== INFERENCE PHASE ===
+Found 85 files belonging to 14 classes.
+  Query set: 85 immagini
+
+=== RISULTATI ===
+
+  Classe                         all  | cosine       all  | mahalanobis      mean | cosine       mean | mahalanobis  
+  -------------------------------------------------------------------------------------------------------------------
+  OVERALL                            90.59                 89.41                 94.12                 89.41         
+  -------------------------------------------------------------------------------------------------------------------
+  [ 0] Asparagus                      80.00                 80.00                 80.00                 80.00         
+  [ 1] Aubergine                      100.00                100.00                100.00                100.00        
+  [ 2] Beet                           100.00                100.00                100.00                100.00        
+  [ 3] Cabbage                        100.00                100.00                100.00                100.00        
+  [ 4] Carrots                        100.00                100.00                100.00                100.00        
+  [ 5] Cucumber                       100.00                100.00                100.00                100.00        
+  [ 6] Ginger                         100.00                75.00                 100.00                100.00        
+  [ 7] Leek                           100.00                100.00                100.00                75.00         
+  [ 8] Mushroom                       100.00                100.00                100.00                100.00        
+  [ 9] Onion                          100.00                100.00                100.00                100.00        
+  [10] Pepper                         93.33                 100.00                100.00                100.00        
+  [11] Potato                         50.00                 50.00                 60.00                 50.00         
+  [12] Tomato                         87.50                 87.50                 100.00                75.00         
+  [13] Zucchini                       100.00                80.00                 100.00                100.00        
+Esecuzione DINOv2-Small completata.
+
+######################################################################
+  BACKBONE: DINOv3-Small
+######################################################################
+Downloading to /root/.cache/kagglehub/models/keras/dinov3/keras/dinov3_vit_small_lvd1689m/1/config.json...
+100%|██████████| 1.13k/1.13k [00:00<00:00, 1.09MB/s]
+Downloading to /root/.cache/kagglehub/models/keras/dinov3/keras/dinov3_vit_small_lvd1689m/1/model.weights.h5...
+100%|██████████| 82.9M/82.9M [00:02<00:00, 39.7MB/s]
+Model: "dinoV3small_feature_extractor"
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┓
+┃ Layer (type)                 ┃ Output Shape          ┃     Param # ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━┩
+│ input_layer (InputLayer)     │ (None, 224, 224, 3)   │           0 │
+├──────────────────────────────┼───────────────────────┼─────────────┤
+│ dinov3_backbone              │ (None, 201, 384)      │  21,596,544 │
+│ (DINOV3Backbone)             │                       │             │
+├──────────────────────────────┼───────────────────────┼─────────────┤
+│ get_item (GetItem)           │ (None, 384)           │           0 │
+└──────────────────────────────┴───────────────────────┴─────────────┘
+ Total params: 21,596,544 (82.38 MB)
+ Trainable params: 0 (0.00 B)
+ Non-trainable params: 21,596,544 (82.38 MB)
+
+=== ENROLLMENT PHASE ===
+Found 407 files belonging to 14 classes.
+  Classi trovate (14): ['Asparagus', 'Aubergine', 'Beet', 'Cabbage', 'Carrots', 'Cucumber', 'Ginger', 'Leek', 'Mushroom', 'Onion', 'Pepper', 'Potato', 'Tomato', 'Zucchini']
+  Gallery (all):  407 prototipi, dim embedding = 384
+  Gallery (mean): 14 prototipi (1 per classe), dim = 384
+
+=== INFERENCE PHASE ===
+Found 85 files belonging to 14 classes.
+  Query set: 85 immagini
+
+=== RISULTATI ===
+
+  Classe                         all  | cosine       all  | mahalanobis      mean | cosine       mean | mahalanobis  
+  -------------------------------------------------------------------------------------------------------------------
+  OVERALL                            85.88                 89.41                 90.59                 90.59         
+  -------------------------------------------------------------------------------------------------------------------
+  [ 0] Asparagus                      60.00                 60.00                 80.00                 100.00        
+  [ 1] Aubergine                      100.00                100.00                100.00                100.00        
+  [ 2] Beet                           100.00                100.00                100.00                100.00        
+  [ 3] Cabbage                        100.00                100.00                100.00                100.00        
+  [ 4] Carrots                        100.00                100.00                100.00                100.00        
+  [ 5] Cucumber                       100.00                100.00                100.00                100.00        
+  [ 6] Ginger                         75.00                 100.00                100.00                100.00        
+  [ 7] Leek                           100.00                100.00                100.00                100.00        
+  [ 8] Mushroom                       100.00                100.00                100.00                100.00        
+  [ 9] Onion                          100.00                100.00                100.00                100.00        
+  [10] Pepper                         100.00                100.00                100.00                100.00        
+  [11] Potato                         60.00                 50.00                 60.00                 50.00         
+  [12] Tomato                         50.00                 75.00                 62.50                 62.50         
+  [13] Zucchini                       80.00                 100.00                100.00                100.00        
+Esecuzione DINOv3-Small completata.

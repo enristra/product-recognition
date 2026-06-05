@@ -1,6 +1,6 @@
 # Product Recognition & Classification
 
-Two computer-vision projects on the [Grocery Store Dataset](https://github.com/marcusklasson/GroceryStoreDataset) by Markus Klasson — a collection of **81 fine-grained product classes** grouped into **43 coarse categories** (fruits, dairy, juices, …).
+Two computer-vision projects on the [Grocery Store Dataset](https://github.com/marcusklasson/GroceryStoreDataset) by Markus Klasson: a collection of **81 fine-grained product classes** grouped into **43 coarse categories** (fruits, dairy, juices, …).
 
 ## 1. Product Classification with CNN
 
